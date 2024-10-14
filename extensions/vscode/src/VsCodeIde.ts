@@ -6,6 +6,7 @@ import type {
   ContinueRcJson,
   FileType,
   IDE,
+  // VSIDE,
   IdeInfo,
   IdeSettings,
   IndexTag,
@@ -34,6 +35,8 @@ import {
   uriFromFilePath,
 } from "./util/vscode";
 import { VsCodeWebviewProtocol } from "./webviewProtocol";
+
+
 
 class VsCodeIde implements IDE {
   ideUtils: VsCodeIdeUtils;
@@ -568,6 +571,20 @@ class VsCodeIde implements IDE {
   async getIdeSettings(): Promise<IdeSettings> {
     return this.getIdeSettingsSync();
   }
-}
 
+  async showMergeDiff(fileContent: string, filePath: string, mode: string = "revert_changes"): Promise<void> {
+        // Creating a virtual file containing ${fileContent} and compare it to the content of ${filePath}.
+        const path = require("path");
+				const fileName = path.basename(filePath);
+        const vUriFileContent = vscode.Uri.parse(`continue:${fileName}`).with({
+          query: Buffer.from(fileContent).toString("utf-8"),
+        });
+				await vscode.commands.executeCommand(
+          "vscode.diff",
+          vUriFileContent,
+          vscode.Uri.file(filePath),
+          `${fileName}: Original ↔ Suggested Changes`
+        );
+  }
+};
 export { VsCodeIde };

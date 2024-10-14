@@ -521,6 +521,10 @@ export interface IDE {
   // Callbacks
   onDidChangeActiveTextEditor(callback: (filepath: string) => void): void;
   pathSep(): Promise<string>;
+  showMergeDiff?(
+    fileContent: string,
+    filePath: string,
+  ): Promise<void>;
 }
 
 // Slash Commands
